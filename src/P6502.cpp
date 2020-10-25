@@ -50,7 +50,7 @@ void P6502::initializeDecodeTable() {
 }
 
 void P6502::resetProgramCounter() {
-    m_program_counter = (WORD) (m_bus->read(RESET_VECTOR) | (m_bus->read(RESET_VECTOR+1)));
+    m_program_counter = (WORD) (m_bus->read(RESET_VECTOR) | (m_bus->read(RESET_VECTOR + 1)));
 }
 
 // addressing modes
@@ -60,60 +60,81 @@ FA(ACC) {
 }
 
 FA(ABS) {
-    WORD address = (WORD) (m_bus->read(++m_program_counter) | (m_bus->read(++m_program_counter) << 8));
-    m_operand = m_bus->read(address);
+    WORD effective_address = (WORD) (m_bus->read(m_program_counter) | (m_bus->read(m_program_counter + 1) << 8));
+    m_operand = effective_address;
+    m_program_counter += 2;
 }
 
 FA(ABX) {
-    WORD address = (WORD) (m_bus->read(++m_program_counter) | (m_bus->read(++m_program_counter) << 8));
-    address += m_x;
-    if (address & 0xFF < m_x) {
+    WORD effective_address = (WORD) (m_bus->read(m_program_counter) | (m_bus->read(m_program_counter + 1) << 8));
+    effective_address += m_x;
+    if ((effective_address & 0xFF) < m_x) {
 	++m_extra_cycles;
     }
-    m_operand = m_bus->read(address);
+    m_operand = effective_address;
+    m_program_counter += 2;
 }
 
 FA(ABY) {
-    WORD address = (WORD) (m_bus->read(++m_program_counter) | (m_bus->read(++m_program_counter) << 8));
-    address += m_y;
-    if (address & 0xFF < m_y) {
+    WORD effective_address = (WORD) (m_bus->read(m_program_counter) | (m_bus->read(m_program_counter + 1) << 8));
+    effective_address += m_y;
+    if ((effective_address & 0xFF) < m_y) {
 	++m_extra_cycles;
     }
-    m_operand = m_bus->read(address);
+    m_operand = effective_address;
+    m_program_counter += 2;
 }
 
 FA(IMM) {
-
+    m_operand = (WORD) (m_bus->read(m_program_counter) & 0xFF);
+    ++m_program_counter;
 }
 
 FA(IMP) {
-
+    m_operand = 0;
 }
 
 FA(IND) {
-
+    WORD address = (WORD) (m_bus->read(m_program_counter) | (m_bus->read(m_program_counter + 1) << 8));
+    WORD effective_address = (WORD) (m_bus->read(address) | (m_bus->read(address + 1) << 8));
+    m_operand = effective_address;
+    m_program_counter += 2;
 }
 
 FA(INX) {
-
+    WORD address = (WORD) ((m_bus->read(m_program_counter) + m_x) & 0xFF);
+    WORD effective_address = (WORD) (m_bus->read(address) | (m_bus->read(address + 1) << 8));
+    m_operand = effective_address;
+    ++m_program_counter;
 }
 
 FA(INY) {
-
+    WORD address = (WORD) (m_bus->read(m_program_counter)& 0xFF);
+    WORD effective_address = (WORD) ((m_bus->read(address) | (m_bus->read(address + 1) << 8)) + m_y);
+    m_operand = effective_address;
+    ++m_program_counter;
 }
 
 FA(REL) {
-
+    WORD pointer_offset = (WORD) (m_bus->read(m_program_counter) & 0xFF);
+    m_operand = pointer_offset;
+    ++m_program_counter;
 }
 
 FA(ZPG) {
-
+    WORD effective_address = (WORD) (m_bus->read(m_program_counter) & 0xFF);
+    m_operand = effective_address;
+    ++m_program_counter;
 }
 
 FA(ZPX) {
-
+    WORD effective_address = (WORD) ((m_bus->read(m_program_counter) + m_x) & 0xFF);
+    m_operand = effective_address;
+    ++m_program_counter;   
 }
 
 FA(ZPY) {
-
+    WORD effective_address = (WORD) ((m_bus->read(m_program_counter) + m_y) & 0xFF);
+    m_operand = effective_address;
+    ++m_program_counter;
 }

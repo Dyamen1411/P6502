@@ -12,10 +12,12 @@ DeviceInterface::~DeviceInterface() {
 
 }
 
+// Returns 0 if the device as access to this address
 BYTE DeviceInterface::isInRange(const WORD &address) const {
     return m_low_range <= address && address <= m_high_range;
 }
 
+// Returns one if both devices can access the same addresses
 BYTE DeviceInterface::overlapsWithDevice(DeviceInterface * other) const {
     return isInRange(other->m_low_range) || isInRange(other->m_high_range);
 }

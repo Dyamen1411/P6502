@@ -10,10 +10,12 @@ class DeviceInterface {
 	DeviceInterface(device_function_pointer write, device_function_pointer read, 
 		const WORD &low_range, const WORD &high_range);
 	~DeviceInterface();
-
+	
+	// Returns 1 if the device as access to this address
 	BYTE isInRange(const WORD &address) const;
+	// Returns one if both devices can access the same addresses
 	BYTE overlapsWithDevice(DeviceInterface * other) const;
-
+	
 	BYTE read(const WORD &address) const;
 	BYTE write(const WORD &address, const BYTE &data) const;
 

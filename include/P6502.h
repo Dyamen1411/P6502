@@ -5,6 +5,7 @@
 #include "opcodes.h"
 
 #define RESET_VECTOR 0xFFFC
+#define IRQ_VECTOR 0xFFFE
 
 class P6502 {
     public:
@@ -16,10 +17,10 @@ class P6502 {
 	void step();
 
     private:
-	void resetProgramCounter();
+	void initializeRegisters();
 
 	// Addressing modes
-	void initializeAddressingModes();
+	void initializeAddressingModeTable();
 	void am_ACC();
 	void am_ABS();
 	void am_ABX();
@@ -35,7 +36,7 @@ class P6502 {
 	void am_ZPY();
 	
 	// Operations
-	void initializeOperations();
+	void initializeOperationTable();
 	void op_ADC();
 	void op_AND();
 	void op_ASL();
@@ -72,6 +73,7 @@ class P6502 {
 	void op_NOP();
 	void op_ORA();
 	void op_PHA();
+	void op_PHP();
 	void op_PLA();
 	void op_PLP();
 	void op_ROL();
@@ -93,16 +95,22 @@ class P6502 {
 	void op_TYA();
 
 	void initializeDecodeTable();
+	
+	// Returns 1 if can't write stack
+	BYTE pushOnStack(const BYTE &data);
+	BYTE pullFromStack();
 
     private:
 	Bus * m_bus;
 
 	function * m_addressing_modes; // 13
-	function * m_operations; // 54
+	function * m_operations; // 55
 	
 	BYTE * m_decode_table;
 	
 	WORD m_operand;
+	BYTE m_is_raw_value; // 0 if operand is an address
+	BYTE m_is_accumulator; // 1 is result must be stored in the accumulator
 
 	BYTE m_extra_cycles;
 

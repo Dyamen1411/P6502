@@ -32,11 +32,14 @@ LDFLAGS :=
 
 # PHONY targets
 
-.PHONY: all clean re getmaintainer getversion
+.PHONY: all rom clean re getmaintainer getversion
 
 # General targets
 
 all: $(EXEC_NAME)
+
+rom:
+	../../vasm/vasm6502_oldstyle -Fbin raw/rom.s -dotdir -o rom/rom
 
 clean:
 	@echo "Removing the build folder"

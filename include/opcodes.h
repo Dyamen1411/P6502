@@ -1,6 +1,8 @@
 #ifndef OPCODES_H
 #define OPCODES_H
 
+// Defines are used to build the decode table
+
 // addressing modes
 #define AACC  0
 #define AABS  1
